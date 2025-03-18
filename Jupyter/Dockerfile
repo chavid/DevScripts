@@ -23,9 +23,9 @@ RUN apt-get install -y time  \
 && apt-get install -y iputils-ping
 
 # conversion des notebooks en pdf
-RUN apt-get install -y texlive-xetex \
-&& apt-get install -y wkhtmltopdf \
-&& apt-get install -y gcc
+RUN apt-get install -y pandoc \
+&& apt-get install -y texlive-xetex \
+&& apt-get install -y wkhtmltopdf
 
 # for mpi4py
 RUN apt-get install -y openmpi-bin libopenmpi-dev

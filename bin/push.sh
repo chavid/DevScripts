@@ -15,4 +15,3 @@ export DEV_SCRIPTS_DOCKER_DIR=${cat_tmp}
 
 # push
 docker push `cat ${DEV_SCRIPTS_DOCKER_DIR}/Dockertag`
-docker push latest

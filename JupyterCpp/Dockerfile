@@ -1,4 +1,4 @@
-FROM devcpp20:v12.2
+FROM devcpp20:v14.2
 
 # For the conversion to pdf
 

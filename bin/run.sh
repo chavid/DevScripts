@@ -13,14 +13,14 @@ Help()
    # Display Help
    echo "Start a container from the current selected image."
    echo
-   echo "Syntax: run.sh [-h|-u|-8|-x|-r]"
+   echo "Syntax: run.sh [-h|-u|-8|-x|-v]"
    echo "options:"
    echo "h     Print this Help."
    echo "u     Run with --user $(id -u):$(id -g)."
    echo "8     Run with -p 8888:8888."
    echo "x     Run with X11 tunelling."
-   echo "g     Run with --gpus all."
-   echo "r     Use an explicit image rather than the default one."
+   echo "g     Run with --gpus all --device=/dev/dri."
+   echo "v     Show the expected docker command."
    echo
 }
 
@@ -39,38 +39,42 @@ fi
 
 # Parse the options
 
-while getopts ":hu8xg" option; do
+while getopts ":hu8xgv" option; do
    case $option in
       h) # display Help
          Help
          exit;;
       u) # enforce user id 1000:1000
          shift
-         export DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g)"
+         DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g)"
          ;;
       8) # forward port 8888
          shift
-         export DEV_SCRIPTS_RUN_8888="-p 8888:8888"
+         DEV_SCRIPTS_RUN_8888="-p 8888:8888"
          ;;
       x) # forward X11
          shift
          xhost + local:docker
-         export DEV_SCRIPTS_RUN_X11="-e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro"
+         DEV_SCRIPTS_RUN_X11="-e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro"
          ;;
       g) # GPUs
          shift
-         export DEV_SCRIPTS_RUN_GPUS="--gpus all"
+         DEV_SCRIPTS_RUN_GPUS="--gpus all --device=/dev/dri"
+         ;;
+      v) # verbose
+         shift
+         verbose="yes"
          ;;
    esac
 done
 
 # Finalize image choice
 
-if [[ -v ignorerecipe ]]
-then
-  image=$1
-  shift
-fi
+#if [[ -v ignorerecipe ]]
+#then
+#  image=$1
+#  shift
+#fi
 if [[ ! -v image ]]
 then
   echo "No image specified with -r and no recipe selected."
@@ -78,5 +82,10 @@ then
 fi
 
 # Main docker command
-
-docker run --network host ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*
+cmd="docker run --network host ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*"
+if [[ -v verbose ]]
+then
+  echo "${cmd}"
+else
+  ${cmd}
+fi
