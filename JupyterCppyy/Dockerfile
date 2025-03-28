@@ -19,22 +19,24 @@ ARG GCC_VERSION=14
 
 # apt-get begin
 RUN apt update --fix-missing \
-&& apt-get install -y apt-utils \
-&& apt install -y software-properties-common \
-&& add-apt-repository ppa:ubuntu-toolchain-r/test
+&& apt-get install -y apt-utils
 
 # utilities
 RUN apt-get install -y time  \
 && apt-get install -y bc \
+&& apt-get install -y curl \
+&& apt-get install -y wget \
 && apt-get install -y iputils-ping
 
 # conversion des notebooks en pdf
 RUN apt-get install -y pandoc \
 && apt-get install -y texlive-xetex \
-&& apt-get install -y wkhtmltopdf \
-&& apt-get install -y gcc
+&& apt-get install -y wkhtmltopdf
 
-RUN apt update && apt install -y make \
+# compilers
+RUN apt install -y software-properties-common \
+&& add-apt-repository ppa:ubuntu-toolchain-r/test \
+&& apt install -y make \
     git \
     gcc-$GCC_VERSION \
     g++-$GCC_VERSION \
@@ -44,6 +46,9 @@ RUN apt update && apt install -y make \
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 100 \
                         --slave /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION
+
+# apt clean up
+RUN apt-get autoremove && rm -rf /var/lib/apt/lists/*
 
 # If we don't specify this cppyy_kernel infers an architecture specific gcc which isn't found...
 ARG CC=gcc
@@ -57,8 +62,9 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN python -m pip install jupyterlab_rise
 RUN python -m pip install git+https://gitlab.inria.fr/sed-saclay/cppyy_kernel.git
 
-# apt clean up
-RUN apt-get autoremove && rm -rf /var/lib/apt/lists/*
+# chatbot
+RUN curl -fsSL https://ollama.com/install.sh | sh
+RUN python -m pip install jupyter-ai
 
 # user
 USER ubuntu
