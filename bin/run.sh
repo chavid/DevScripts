@@ -45,28 +45,24 @@ while getopts ":hu8xgv" option; do
          Help
          exit;;
       u) # enforce user id 1000:1000
-         shift
          DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g)"
          ;;
       8) # forward port 8888
-         shift
          DEV_SCRIPTS_RUN_8888="-p 8888:8888"
          ;;
       x) # forward X11
-         shift
          xhost + local:docker
          DEV_SCRIPTS_RUN_X11="-e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro"
          ;;
       g) # GPUs
-         shift
          DEV_SCRIPTS_RUN_GPUS="--gpus all --device=/dev/dri"
          ;;
       v) # verbose
-         shift
          verbose="yes"
          ;;
    esac
 done
+shift $((OPTIND-1))  # Remove all the options that have been processed
 
 # Finalize image choice
 
@@ -82,7 +78,7 @@ then
 fi
 
 # Main docker command
-cmd="docker run --network host ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*"
+cmd="docker run --network host --shm-size=16g ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*"
 if [[ -v verbose ]]
 then
   echo "${cmd}"
