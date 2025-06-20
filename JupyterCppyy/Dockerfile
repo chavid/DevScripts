@@ -33,19 +33,23 @@ RUN apt-get install -y pandoc \
 && apt-get install -y texlive-xetex \
 && apt-get install -y wkhtmltopdf
 
-# compilers
+# compilers and build tools
 RUN apt install -y software-properties-common \
 && add-apt-repository ppa:ubuntu-toolchain-r/test \
-&& apt install -y make \
-    git \
-    gcc-$GCC_VERSION \
-    g++-$GCC_VERSION \
-    python3 \
-    python3-venv \
-    python3-dev
+&& apt install -y git \
+&& apt install -y gcc-$GCC_VERSION \
+&& apt install -y g++-$GCC_VERSION \
+&& apt install -y python3 \
+&& apt install -y python3-venv \
+&& apt install -y python3-dev \
+&& apt-get install -y build-essential  \
+&& apt-get install -y make \
+&& apt-get install -y cmake
 
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 100 \
-                        --slave /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION
+
+RUN update-alternatives \
+--install /usr/bin/gcc gcc /usr/bin/gcc-$GCC_VERSION 100 \
+--slave /usr/bin/g++ g++ /usr/bin/g++-$GCC_VERSION
 
 # apt clean up
 RUN apt-get autoremove && rm -rf /var/lib/apt/lists/*
