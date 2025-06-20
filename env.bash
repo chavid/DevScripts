@@ -15,6 +15,7 @@ alias drecipe=${DEV_SCRIPTS_DIR}/bin/recipe.sh
 alias dbuild=${DEV_SCRIPTS_DIR}/bin/build.sh
 alias drun=${DEV_SCRIPTS_DIR}/bin/run.sh
 alias dpush=${DEV_SCRIPTS_DIR}/bin/push.sh
+alias dpull=${DEV_SCRIPTS_DIR}/bin/pull.sh
 
 alias count=${DEV_SCRIPTS_DIR}/bin/count.sh
 alias oval=${DEV_SCRIPTS_DIR}/bin/oval.py
