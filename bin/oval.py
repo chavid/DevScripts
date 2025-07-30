@@ -141,7 +141,7 @@ def apply_run(target,multi,expanded):
 # ==========================================
 # SUBCOMMAND: Diff
 
-time_exp = re.compile('^(\w+)\s+([0-9]+)m([.0-9]+)s$')
+time_exp = re.compile(r'^(\w+)\s+([0-9]+)m([.0-9]+)s$')
 
 def apply_diff(target,multi,expanded):
 
