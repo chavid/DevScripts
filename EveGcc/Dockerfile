@@ -14,7 +14,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 ARG DEBIAN_FRONTEND=noninteractive
 
 # KIWAKU
-RUN git clone --single-branch -b david-stable https://github.com/jfalcou/eve.git
+RUN git clone https://github.com/jfalcou/eve.git
 RUN cd eve \
 && mkdir build && cd build \
 && cmake .. -G Ninja \
