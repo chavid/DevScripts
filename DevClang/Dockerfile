@@ -1,4 +1,4 @@
-FROM gcc:14.2.0
+FROM silkeh/clang:20-bookworm
 
 # Ensure use of bash
 SHELL ["/bin/bash","-c"]
@@ -48,29 +48,6 @@ RUN apt-get install -y python3 \
 RUN apt-get install -y python-is-python3
 RUN apt-get install -y pipx
 
-# For the conversion of notebooks to pdf via latex
-RUN apt-get install -y pandoc
-RUN apt-get install -y texlive
-#&& apt-get install -y texlive-xetex \
-#&& apt-get install -y texlive-fonts-recommended \
-#&& apt-get install -y texlive-generic-extra \
-#&& apt-get install -y texlive-generic-recommended
-
-# For the conversion of notebooks to pdf via html (betatim)
-RUN apt-get install -y libx11-xcb1 \
-&& apt-get install -y libxtst6 \
-&& apt-get install -y libxrandr2 \
-&& apt-get install -y libasound2 \
-&& apt-get install -y libpangocairo-1.0-0 \
-&& apt-get install -y libatk1.0-0 \
-&& apt-get install -y libatk-bridge2.0-0 \
-&& apt-get install -y libgtk-3-0 \
-&& apt-get install -y libnss3 \
-&& apt-get install -y libxss1
-
-# Installations apt-get, FIN
-RUN rm -rf /var/lib/apt/lists/*
-
 # Maqao
 RUN mkdir -p /opt &&  cd /opt && \
     wget https://www.maqao.org/maqao_archive/maqao.x86_64.2.18.0.tar.xz && \
@@ -81,14 +58,6 @@ RUN mkdir -p /opt &&  cd /opt && \
 COPY hyperfine_1.16.1_amd64.deb .
 RUN dpkg -i hyperfine_1.16.1_amd64.deb
 
-# EVE
-RUN git clone -b main https://github.com/jfalcou/eve.git
-RUN cd eve \
-&& mkdir build && cd build \
-&& cmake .. -G Ninja \
-&& ninja install \
-&& ninja doxygen
- 
 # fmtlib/fmt
 RUN git clone https://github.com/fmtlib/fmt.git
 RUN cd fmt \
@@ -96,14 +65,15 @@ RUN cd fmt \
 && cmake -DBUILD_SHARED_LIBS=ON -DFMT_TEST=OFF .. \
 && make install
 
-# libcoro
-RUN git clone --recurse-submodules https://github.com/jbaldwin/libcoro.git
-RUN cd libcoro \
-&& mkdir Release && cd Release \
-&& cmake -DCMAKE_BUILD_TYPE=Release -DLIBCORO_BUILD_TESTS=OFF -DLIBCORO_BUILD_EXAMPLES=OFF .. \
-&& cmake --build . \
-&& cp -r ../include/coro /usr/local/include \
-&& cp -f libcoro.a /usr/local/lib
+# DOES NOT FIND OPENSSL
+## libcoro
+#RUN git clone --recurse-submodules https://github.com/jbaldwin/libcoro.git
+#RUN cd libcoro \
+#&& mkdir Release && cd Release \
+#&& cmake -DCMAKE_BUILD_TYPE=Release -DLIBCORO_BUILD_TESTS=OFF -DLIBCORO_BUILD_EXAMPLES=OFF .. \
+#&& cmake --build . \
+#&& cp -r ../include/coro /usr/local/include \
+#&& cp -f libcoro.a /usr/local/lib
 
 # Eigen
 COPY eigen-3.4.0.tar.gz .
@@ -126,22 +96,6 @@ RUN cd cadna_c-3.1.11 \
 && cd .. \
 && rm -rf cadna_c-3.1.11.tar.gz \
 && rm -rf cadna_c-3.1.11
-
-# group
-ARG GROUP_ID=1000
-RUN addgroup --gid ${GROUP_ID} dev
-
-# user
-ARG USER_ID=1000
-RUN adduser --shell /bin/bash --uid ${USER_ID} --gid ${GROUP_ID} --disabled-password dev
-USER dev
-
-# Installations pipx
-RUN python -m pipx ensurepath
-RUN python -m pipx install conan
-# pip complement for nb=>pdf via html
-#RUN python -m pipx notebook-as-pdf
-#RUN pyppeteer-install
 
 # Local copy of my tools
 COPY mydevtools /mydevtools
