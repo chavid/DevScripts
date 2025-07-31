@@ -99,15 +99,6 @@ RUN cd cadna_c-3.1.11 \
 && rm -rf cadna_c-3.1.11.tar.gz \
 && rm -rf cadna_c-3.1.11
 
-# group
-ARG GROUP_ID=1000
-RUN addgroup --gid ${GROUP_ID} dev
-
-# user
-ARG USER_ID=1000
-RUN adduser --shell /bin/bash --uid ${USER_ID} --gid ${GROUP_ID} --disabled-password dev
-USER dev
-
 # Installations pipx
 RUN python -m pipx ensurepath
 RUN python -m pipx install conan
