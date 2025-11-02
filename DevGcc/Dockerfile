@@ -1,4 +1,4 @@
-FROM gcc:15.1.0-bookworm
+FROM gcc:15.2.0-trixie
 
 # Ensure use of bash
 SHELL ["/bin/bash","-c"]
@@ -26,6 +26,7 @@ RUN apt-get install -y time \
 
 # Installations apt-get, C++ Tools
 RUN apt-get install -y build-essential  \
+&& apt-get install -y make  \
 && apt-get install -y cmake  \
 && apt-get install -y ninja-build  \
 && apt-get install -y doxygen  \
@@ -42,6 +43,7 @@ RUN apt-get install -y libtbb-dev  \
 
 # Installations apt-get, PYTHON
 RUN apt-get install -y python3 \
+&& apt-get install -y python3-venv \
 && apt-get install -y python3-dev \
 && apt-get install -y python3-pip \
 && apt-get install -y python3-tk
@@ -52,14 +54,14 @@ RUN apt-get install -y pipx
 RUN rm -rf /var/lib/apt/lists/*
 
 # Maqao
-RUN mkdir -p /opt &&  cd /opt && \
-    wget https://www.maqao.org/maqao_archive/maqao.x86_64.2.18.0.tar.xz && \
-    tar xvf maqao.x86_64.2.18.0.tar.xz && \
-    rm -f maqao.x86_64.2.18.0.tar.xz
+COPY maqao.x86_64.2025.1.0.tar.xz .
+RUN tar -xvf maqao.x86_64.2025.1.0.tar.xz \
+ && cp maqao.x86_64.2025.1.0/bin/maqao /usr/local/bin/maqao \
+ && rm -rf maqao.x86_64.2025.1.0.tar.xz maqao.x86_64.2025.1.0/
 
 # Hyperfine
-COPY hyperfine_1.16.1_amd64.deb .
-RUN dpkg -i hyperfine_1.16.1_amd64.deb
+COPY hyperfine_1.19.0_amd64.deb .
+RUN dpkg -i hyperfine_1.19.0_amd64.deb
 
 # fmtlib/fmt
 RUN git clone https://github.com/fmtlib/fmt.git
@@ -78,26 +80,26 @@ RUN cd libcoro \
 && cp -f libcoro.a /usr/local/lib
 
 # Eigen
-COPY eigen-3.4.0.tar.gz .
-RUN tar -xvf eigen-3.4.0.tar.gz
-RUN cd eigen-3.4.0 \
-&& mkdir -p build \
-&& cd build \
-&& cmake .. \
-&& make install \
-&& cd ../.. \
-&& rm -rf eigen-3.4.0.tar.gz \
-&& rm -rf eigen-3.4.0
+COPY eigen-5.0.0.tar.gz .
+RUN tar -xvf eigen-5.0.0.tar.gz
+RUN cd eigen-5.0.0 \
+ && mkdir -p build \
+ && cd build \
+ && cmake .. \
+ && make install \
+ && cd ../.. \
+ && rm -rf eigen-5.0.0.tar.gz \
+ && rm -rf eigen-5.0.0
 
 # CADNA
 COPY cadna_c-3.1.11.tar.gz .
 RUN tar -xvf cadna_c-3.1.11.tar.gz
 RUN cd cadna_c-3.1.11 \
-&& ./configure \
-&& make install \
-&& cd .. \
-&& rm -rf cadna_c-3.1.11.tar.gz \
-&& rm -rf cadna_c-3.1.11
+ && ./configure \
+ && make install \
+ && cd .. \
+ && rm -rf cadna_c-3.1.11.tar.gz \
+ && rm -rf cadna_c-3.1.11
 
 # Installations pipx
 RUN python -m pipx ensurepath

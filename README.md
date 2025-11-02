@@ -90,3 +90,5 @@ non-root, you may encounter access right problems, especially when running noteb
 - https://www.redhat.com/sysadmin/arguments-options-bash-scripts
 - https://fr.wikibooks.org/wiki/Programmation_Bash/Tests
 - https://www.golinuxcloud.com/bash-getopts/
+
+

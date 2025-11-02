@@ -1,5 +1,5 @@
-# Baseline debian 12 (0.075 GiB)
-FROM debian:bookworm-slim
+# Baseline debian 13 (78.6MB)
+FROM debian:trixie-slim
 
 # Local copy of my tools
 COPY mydevtools /mydevtools
@@ -19,7 +19,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Installations apt-get, DEBUT
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y  apt-utils
+ && apt-get install -y apt-utils
 
 # Installations apt-get, UTILITAIRES
 RUN apt-get install -y binutils \
@@ -33,7 +33,6 @@ RUN apt-get install -y binutils \
 
 # Installations apt-get, C++ Tools
 RUN apt-get install -y build-essential \
- && apt-get install -y software-properties-common \
  && apt-get install -y hwloc \
  && apt-get install -y git \
  && apt-get install -y cmake ninja-build \
@@ -64,15 +63,9 @@ RUN apt-get install -y g++ \
 RUN apt-get -y clean autoremove \
  && rm -rf /var/lib/apt/lists/*
 
-# Maqao
-RUN wget https://maqao.org/maqao_archive/maqao.x86_64.2.20.1.tar.xz \
- && tar -xvf maqao.x86_64.2.20.1.tar.xz \
- && cp maqao.x86_64.2.20.1/bin/maqao /usr/local/bin/maqao \
- && rm -rf maqao.x86_64.2.20.1.tar.xz maqao.x86_64.2.20.1/
-
 # Hyperfine
-COPY hyperfine_1.16.1_amd64.deb .
-RUN dpkg -i hyperfine_1.16.1_amd64.deb
+COPY hyperfine_1.19.0_amd64.deb .
+RUN dpkg -i hyperfine_1.19.0_amd64.deb
 
 # fmtlib/fmt
 RUN git clone https://github.com/fmtlib/fmt.git
@@ -90,17 +83,23 @@ RUN cd libcoro \
  && cp -r ../include/coro /usr/local/include \
  && cp -f libcoro.a /usr/local/lib
 
+# Maqao
+COPY maqao.x86_64.2025.1.0.tar.xz .
+RUN tar -xvf maqao.x86_64.2025.1.0.tar.xz \
+ && cp maqao.x86_64.2025.1.0/bin/maqao /usr/local/bin/maqao \
+ && rm -rf maqao.x86_64.2025.1.0.tar.xz maqao.x86_64.2025.1.0/
+
 # Eigen
-COPY eigen-3.4.0.tar.gz .
-RUN tar -xvf eigen-3.4.0.tar.gz
-RUN cd eigen-3.4.0 \
+COPY eigen-5.0.0.tar.gz .
+RUN tar -xvf eigen-5.0.0.tar.gz
+RUN cd eigen-5.0.0 \
  && mkdir -p build \
  && cd build \
  && cmake .. \
  && make install \
  && cd ../.. \
- && rm -rf eigen-3.4.0.tar.gz \
- && rm -rf eigen-3.4.0
+ && rm -rf eigen-5.0.0.tar.gz \
+ && rm -rf eigen-5.0.0
 
 # CADNA
 COPY cadna_c-3.1.11.tar.gz .

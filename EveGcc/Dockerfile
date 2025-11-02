@@ -1,4 +1,4 @@
-FROM chavid/dev-gcc:15.1.0-bookworm
+FROM chavid/dev-gcc:15.2.0-trixie
 
 # Ensure use of bash
 SHELL ["/bin/bash","-c"]
