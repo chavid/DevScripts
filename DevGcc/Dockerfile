@@ -98,15 +98,27 @@ RUN cd cadna_c-3.1.11 \
  && ./configure \
  && make install \
  && cd .. \
- && rm -rf cadna_c-3.1.11.tar.gz \
+ && rm -f cadna_c-3.1.11.tar.gz \
  && rm -rf cadna_c-3.1.11
 
+# Conan
+COPY conan-2.22.1-linux-x86_64.tgz .
+RUN tar xzf conan-2.22.1-linux-x86_64.tgz --skip-old-files -C /usr/local \
+ && rm -f conan-2.22.1-linux-x86_64.tgz
+
+# Installations pip
+#RUN python -m pip install --break-system-packages --root-user-action=ignore conan
+
 # Installations pipx
-RUN python -m pipx ensurepath
-RUN python -m pipx install conan
+#RUN python -m pipx ensurepath
+#RUN python -m pipx install conan
 # pip complement for nb=>pdf via html
 #RUN python -m pipx notebook-as-pdf
 #RUN pyppeteer-install
+
+# Enforce home so to use option --user
+ENV HOME /root
+RUN chmod a+rwx "${HOME}"
 
 # Local copy of my tools
 COPY mydevtools /mydevtools

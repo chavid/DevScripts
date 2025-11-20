@@ -13,9 +13,11 @@ Help()
    # Display Help
    echo "Start a container from the current selected image."
    echo
-   echo "Syntax: run.sh [-h|-u|-8|-x|-v]"
+   echo "Syntax: run.sh [-h|-p|-P|-u|-8|-x|-v]"
    echo "options:"
    echo "h     Print this Help."
+   echo "p     Run with podman."
+   echo "P     Run with podman and the docker.io prefix."
    echo "u     Run with --user $(id -u):$(id -g)."
    echo "8     Run with -p 8888:8888."
    echo "x     Run with X11 tunelling."
@@ -39,11 +41,20 @@ fi
 
 # Parse the options
 
+DEV_SCRIPTS_CMD="docker"
 while getopts ":hu8xgv" option; do
    case $option in
       h) # display Help
          Help
          exit;;
+      p) DEV_SCRIPTS_CMD="podman"
+         ;;
+      P) DEV_SCRIPTS_CMD="podman"
+         if [[ -v image ]]
+         then
+           image="docker.io/${image}"
+         fi
+         ;;
       u) # enforce user id 1000:1000
          DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g)"
          ;;
@@ -77,8 +88,8 @@ then
   exit
 fi
 
-# Main docker command
-cmd="docker run --network host --shm-size=16g ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*"
+# Main command
+cmd="${DEV_SCRIPTS_CMD} run --network host --shm-size=16g ${DEV_SCRIPTS_RUN_GPUS} ${DEV_SCRIPTS_RUN_8888} ${DEV_SCRIPTS_RUN_X11} ${DEV_SCRIPTS_RUN_USER} -it --rm -v ${PWD}:/work -w /work -e DTAG=${image} ${image} $*"
 if [[ -v verbose ]]
 then
   echo "${cmd}"

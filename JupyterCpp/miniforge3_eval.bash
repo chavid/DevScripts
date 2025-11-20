@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 
-# Init env
-__conda_setup="$('/home/dev/miniforge3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
+# Initialize conda (installed in $HOME/miniforge3 by Dockerfile)
+__conda_setup="$($HOME/miniforge3/bin/conda shell.bash hook 2> /dev/null)" || true
+if [[ -n "${__conda_setup}" ]]; then
+    eval "${__conda_setup}"
+elif [[ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]]; then
+    # shellcheck disable=SC1090
+    . "$HOME/miniforge3/etc/profile.d/conda.sh"
+    conda activate base || true
 else
-    if [ -f "/home/dev/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/home/dev/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/dev/miniforge3/bin:$PATH"
-    fi
+    export PATH="$HOME/miniforge3/bin:$PATH"
 fi
 unset __conda_setup
 
-# Eval
-
-eval $*
+# Forward all arguments safely (e.g. mamba install -y pkg)
+eval "$@"
 
