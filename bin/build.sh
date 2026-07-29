@@ -44,8 +44,8 @@ export DEV_SCRIPTS_DOCKER_DIR=${cat_tmp}
 
 # Prepare data to be eventually copied in the image
 cd ${DEV_SCRIPTS_DOCKER_DIR}
-rm -rf mydevtools
-cp -r ${DEV_SCRIPTS_DIR}/bin mydevtools
+rm -rf myhome
+cp -a ${DEV_SCRIPTS_DIR}/home myhome
 
 # Main docker command
 if [ -z "${DEV_SCRIPTS_BUILD_FORCE}" ]

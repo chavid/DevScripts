@@ -1,21 +1,22 @@
 
-ORIGINAL_DIR=${PWD}
-
 # establish the script directory absolute path
 
-DEV_SCRIPTS_ENV_FILE=${BASH_SOURCE[0]}
-DEV_SCRIPTS_DIR=`dirname ${DEV_SCRIPTS_ENV_FILE}`
-cd ${DEV_SCRIPTS_DIR}
-DEV_SCRIPTS_DIR=`pwd`
+ORIGINAL_DIR=${PWD}
+DEV_DOCKER_ENV_FILE=${BASH_SOURCE[0]}
+DEV_DOCKER_DIR=`dirname ${DEV_DOCKER_ENV_FILE}`
+cd ${DEV_DOCKER_DIR}
+DEV_DOCKER_DIR=`pwd`
 cd ${ORIGINAL_DIR}
 
-# aliases
+# aliases for the host only
 
-alias drecipe=${DEV_SCRIPTS_DIR}/bin/recipe.sh
-alias dbuild=${DEV_SCRIPTS_DIR}/bin/build.sh
-alias drun=${DEV_SCRIPTS_DIR}/bin/run.sh
-alias dpush=${DEV_SCRIPTS_DIR}/bin/push.sh
-alias dpull=${DEV_SCRIPTS_DIR}/bin/pull.sh
+alias drecipe=${DEV_DOCKER_DIR}/bin/recipe.sh
+alias dbuild=${DEV_DOCKER_DIR}/bin/build.sh
+alias drun=${DEV_DOCKER_DIR}/bin/run.sh
+alias dpush=${DEV_DOCKER_DIR}/bin/push.sh
+alias dpull=${DEV_DOCKER_DIR}/bin/pull.sh
 
-alias count=${DEV_SCRIPTS_DIR}/bin/count.sh
-alias oval=${DEV_SCRIPTS_DIR}/bin/oval.py
+# setup for the host and the containers
+
+source ${DEV_DOCKER_DIR}/home/.bashrc
+

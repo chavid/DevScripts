@@ -13,12 +13,13 @@ Help()
    # Display Help
    echo "Start a container from the current selected image."
    echo
-   echo "Syntax: run.sh [-h|-p|-P|-u|-8|-x|-v]"
+   echo "Syntax: run.sh [-h|-p|-P|-r|-8|-x|-v]"
    echo "options:"
    echo "h     Print this Help."
    echo "p     Run with podman."
    echo "P     Run with podman and the docker.io prefix."
-   echo "u     Run with --user $(id -u):$(id -g)."
+   echo "r     Do not run with --user $(id -u):$(id -g) -e HOME=/myhome."
+   echo "j     For jupyter stack, with --user root -e NB_UID=$(id -u) -e NB_GID=$(id -g)."
    echo "8     Run with -p 8888:8888."
    echo "x     Run with X11 tunelling."
    echo "g     Run with --gpus all --device=/dev/dri."
@@ -42,7 +43,8 @@ fi
 # Parse the options
 
 DEV_SCRIPTS_CMD="docker"
-while getopts ":hu8xgv" option; do
+DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g) -e HOME=/myhome"
+while getopts ":huj8xgv" option; do
    case $option in
       h) # display Help
          Help
@@ -55,8 +57,11 @@ while getopts ":hu8xgv" option; do
            image="docker.io/${image}"
          fi
          ;;
-      u) # enforce user id 1000:1000
-         DEV_SCRIPTS_RUN_USER="--user $(id -u):$(id -g)"
+      r) # remove user id
+         DEV_SCRIPTS_RUN_USER=""
+         ;;
+      j) # enforce host user id in a "jupyter stack" way
+         DEV_SCRIPTS_RUN_USER="--user root -e NB_UID=$(id -u) -e NB_GID=$(id -g)"
          ;;
       8) # forward port 8888
          DEV_SCRIPTS_RUN_8888="-p 8888:8888"

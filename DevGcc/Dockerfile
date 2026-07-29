@@ -1,3 +1,4 @@
+# trixie is debian 13
 FROM gcc:15.2.0-trixie
 
 # Ensure use of bash
@@ -6,12 +7,12 @@ SHELL ["/bin/bash","-c"]
 # timezone
 ENV TZ=Europe/Paris
 
-# So to avoid debconf interactive questions
+# Ways to avoid debconf interactive questions
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Installations apt-get, DEBUT
-RUN apt-get update \
+RUN apt-get update --fix-missing \
 && apt-get upgrade -y \
 && apt-get install -y apt-utils
 
@@ -51,7 +52,7 @@ RUN apt-get install -y python-is-python3
 RUN apt-get install -y pipx
 
 # Installations apt-get, FIN
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get autoremove && rm -rf /var/lib/apt/lists/*
 
 # Maqao
 COPY maqao.x86_64.2025.1.0.tar.xz .
@@ -101,10 +102,15 @@ RUN cd cadna_c-3.1.11 \
  && rm -f cadna_c-3.1.11.tar.gz \
  && rm -rf cadna_c-3.1.11
 
-# Conan
-COPY conan-2.22.1-linux-x86_64.tgz .
-RUN tar xzf conan-2.22.1-linux-x86_64.tgz --skip-old-files -C /usr/local \
- && rm -f conan-2.22.1-linux-x86_64.tgz
+# Conan & mp-units 
+WORKDIR /tmp
+COPY conan-2.28.1-linux-x86_64.tgz .
+RUN tar xzf conan-2.28.1-linux-x86_64.tgz --skip-old-files -C /usr/local \
+ && rm -f conan-2.28.1-linux-x86_64.tgz
+RUN conan profile detect --force
+RUN sed -i 's/compiler.cppstd=.*/compiler.cppstd=23/' ~/.conan2/profiles/default
+COPY conanfile.txt .
+RUN conan install --requires=mp-units/2.4.0 -b=missing
 
 # Installations pip
 #RUN python -m pip install --break-system-packages --root-user-action=ignore conan
@@ -117,11 +123,16 @@ RUN tar xzf conan-2.22.1-linux-x86_64.tgz --skip-old-files -C /usr/local \
 #RUN pyppeteer-install
 
 # Enforce home so to use option --user
-ENV HOME /root
-RUN chmod a+rwx "${HOME}"
+ENV HOME=/root
+RUN chmod -R a+rwx "${HOME}"
 
 # Local copy of my tools
 COPY mydevtools /mydevtools
 
+# Set the wrapper as the Entrypoint
+ENTRYPOINT ["/mydevtools/entrypoint.bash"]
+
 # Start a shell by default
-CMD bash --rcfile /mydevtools/bashrc
+CMD bash
+
+
